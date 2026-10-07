@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM Engine — Interactive Live Recommender</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-6 font-sans">
+
+  <div class="max-w-7xl mx-auto space-y-6">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-5">
+      <div>
+        <h1 class="text-3xl font-extrabold text-indigo-400 tracking-tight">PRISM Engine</h1>
+        <p class="text-slate-400 text-sm">Interactive Academic & Career Recommendation Portal</p>
+      </div>
+
+      <!-- Mode Toggle -->
+      <div class="bg-slate-800 p-1 rounded-xl border border-slate-700 flex text-xs font-semibold">
+        <button id="tabCustom" onclick="switchTab('custom')" class="px-4 py-2 rounded-lg bg-indigo-600 text-white shadow">
+          Interactive Live Simulator
+        </button>
+        <button id="tabDb" onclick="switchTab('db')" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+          Database ID Lookup
+        </button>
+      </div>
+    </header>
+
+    <!-- SECTION 1: LIVE INTERACTIVE SIMULATOR INPUTS -->
+    <div id="customFormSection" class="bg-slate-800/80 border border-slate-700 p-6 rounded-xl space-y-4">
+      <h2 class="text-lg font-bold text-indigo-400">Input Profile Constraints</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Academic Score (%)</label>
+          <input id="customScore" type="number" min="0" max="100" value="85" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Annual Parent Budget (₹)</label>
+          <input id="customBudget" type="number" step="10000" value="250000" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Max Loan Capacity (₹)</label>
+          <input id="customLoan" type="number" step="10000" value="100000" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Target Relocation State</label>
+          <select id="customState" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+            <option value="Karnataka">Karnataka</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Kerala">Kerala</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+            <option value="Telangana">Telangana</option>
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="calculateCustomPath()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-2.5 rounded-lg font-semibold shadow text-sm">
+            Calculate Live Path
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: DATABASE ID SEARCH INPUT -->
+    <div id="dbSearchSection" class="hidden bg-slate-800/80 border border-slate-700 p-6 rounded-xl">
+      <div class="flex items-center gap-3">
+        <input id="studentIdInput" type="text" value="STU10001" placeholder="Enter Student ID (STU10001 - STU11000)" 
+               class="px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white w-full md:w-80">
+        <button onclick="fetchDbRecommendations()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 font-semibold rounded-lg shadow whitespace-nowrap">
+          Search DB Record
+        </button>
+      </div>
+    </div>
+
+    <!-- Recommendations Grid -->
+    <div class="space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold text-white">Ranked Matches</h2>
+        <span id="matchCount" class="text-xs text-slate-400">Ready for calculation</span>
+      </div>
+
+      <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="col-span-full text-center py-12 text-slate-500">
+          Adjust inputs above and click <b>Calculate Live Path</b>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configurable API base URL (Change this to your hosted backend URL when live)
+    const API_BASE = "http://localhost:8000";
+
+    function switchTab(mode) {
+      if (mode === 'custom') {
+        document.getElementById("customFormSection").classList.remove("hidden");
+        document.getElementById("dbSearchSection").classList.add("hidden");
+        document.getElementById("tabCustom").className = "px-4 py-2 rounded-lg bg-indigo-600 text-white shadow";
+        document.getElementById("tabDb").className = "px-4 py-2 rounded-lg text-slate-400 hover:text-white";
+      } else {
+        document.getElementById("customFormSection").classList.add("hidden");
+        document.getElementById("dbSearchSection").classList.remove("hidden");
+        document.getElementById("tabDb").className = "px-4 py-2 rounded-lg bg-indigo-600 text-white shadow";
+        document.getElementById("tabCustom").className = "px-4 py-2 rounded-lg text-slate-400 hover:text-white";
+      }
+    }
+
+    async function calculateCustomPath() {
+      const payload = {
+        student_name: "Interactive User",
+        stream: "Science",
+        academic_percentage: parseFloat(document.getElementById("customScore").value),
+        annual_budget_inr: parseFloat(document.getElementById("customBudget").value),
+        loan_capacity_inr: parseFloat(document.getElementById("customLoan").value),
+        relocation_state_preference: document.getElementById("customState").value
+      };
+
+      const grid = document.getElementById("resultsGrid");
+      grid.innerHTML = `<div class="col-span-full text-center py-12 text-indigo-400 font-semibold animate-pulse">Calculating live match scores...</div>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/recommend/custom`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        renderRecommendations(data.recommendations);
+      } catch (err) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-rose-400">Backend server disconnected. Start main.py or update API_BASE.</div>`;
+      }
+    }
+
+    async function fetchDbRecommendations() {
+      const id = document.getElementById("studentIdInput").value.trim();
+      const grid = document.getElementById("resultsGrid");
+      grid.innerHTML = `<div class="col-span-full text-center py-12 text-indigo-400 font-semibold animate-pulse">Fetching DB student profile...</div>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/recommend/${id}`);
+        const data = await res.json();
+        renderRecommendations(data.recommendations);
+      } catch (err) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-rose-400">Failed to fetch student profile.</div>`;
+      }
+    }
+
+    function renderRecommendations(items) {
+      const grid = document.getElementById("resultsGrid");
+      document.getElementById("matchCount").innerText = `Found ${items.length} options`;
+      grid.innerHTML = "";
+
+      items.forEach((rec, idx) => {
+        const card = `
+          <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl space-y-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">#${idx + 1}</span>
+                <h3 class="font-bold text-white text-base mt-1">${rec.course_name}</h3>
+                <p class="text-xs text-slate-400">${rec.state_name} ${rec.state_match ? '★ Preferred' : ''}</p>
+              </div>
+              <div class="text-right">
+                <div class="text-2xl font-black text-indigo-400">${rec.prism_match_score}%</div>
+                <span class="text-[9px] text-slate-400 uppercase">PRISM Score</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2.5 rounded border border-slate-700/50">
+              <div><span class="text-slate-400 text-[10px]">Annual Fee</span><p class="font-semibold text-white">₹${(rec.min_fee/100000).toFixed(2)}L - ₹${(rec.max_fee/100000).toFixed(2)}L</p></div>
+              <div><span class="text-slate-400 text-[10px]">Median Salary</span><p class="font-semibold text-emerald-400">₹${(rec.median_salary/100000).toFixed(2)} LPA</p></div>
+            </div>
+            <div class="flex justify-between items-center text-xs pt-1">
+              <span class="px-2 py-0.5 rounded border border-slate-600 text-[10px] text-slate-300">Scope: ${rec.future_scope}</span>
+              <span class="text-slate-400 text-[10px]">Acad: ${rec.academic_fit}% | Fin: ${rec.financial_affordability}%</span>
+            </div>
+          </div>
+        `;
+        grid.innerHTML += card;
+      });
+    }
+
+    // Auto calculate on load
+    calculateCustomPath();
+  </script>
+</body>
+</html>
