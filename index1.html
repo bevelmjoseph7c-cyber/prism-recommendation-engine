@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PRISM – Course and State Sheet</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--paper:#fbfbf8;--ink:#1c1f26;--print:#b0262f;--pen:#1b3a8c;--mut:#5c616d;--rule:#d9d9d2;--good:#1d7a46;--bad:#b0262f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#15171d;--ink:#e8e8e3;--print:#ee6d73;--pen:#8fb0ff;--mut:#9a9fab;--rule:#2d3039;--good:#59c585;--bad:#ee6d73}}
+:root[data-theme="dark"]{--paper:#15171d;--ink:#e8e8e3;--print:#ee6d73;--pen:#8fb0ff;--mut:#9a9fab;--rule:#2d3039;--good:#59c585;--bad:#ee6d73}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 "Source Serif 4",Georgia,"Times New Roman",serif}
+.sheet{max-width:920px;margin:0 auto;padding:28px 18px 70px}
+h1,h2,.hd{font-family:"Archivo Narrow","Arial Narrow",Arial,sans-serif;font-weight:700}
+h1{font-size:clamp(3.4rem,13vw,7rem);line-height:.85;margin:0;color:var(--print);letter-spacing:-.01em}
+.intro{max-width:56ch;margin:14px 0 0}
+h2{font-size:1.6rem;margin:0;color:var(--print)}
+.part{border-top:4px solid var(--print);margin-top:44px;padding-top:10px}
+.part .note{color:var(--mut);font-size:.95rem;margin:2px 0 14px}
+.srow{display:grid;grid-template-columns:150px 90px 1fr 1fr;gap:10px 16px;align-items:center;padding:9px 0;border-bottom:1px solid var(--rule)}
+.srow.h{font-family:"Archivo Narrow",Arial,sans-serif;color:var(--mut);font-size:.95rem;border-bottom:2px solid var(--ink)}
+.bubbles{display:flex;gap:6px}.bubbles label{position:relative}
+.bubbles input{appearance:none;width:30px;height:30px;border:2px solid var(--print);border-radius:50%;margin:0;cursor:pointer;display:block}
+.bubbles input:checked{background:var(--pen);border-color:var(--pen)}
+.bubbles span{position:absolute;inset:0;display:grid;place-items:center;font:700 .8rem "Archivo Narrow",Arial,sans-serif;pointer-events:none;color:var(--print)}
+.bubbles input:checked+span{color:var(--paper)}
+input:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+input[type=number]{width:100%;font:inherit;color:var(--pen);font-weight:600;background:transparent;border:0;border-bottom:2px solid var(--ink);padding:3px 2px;border-radius:0}
+input[type=range]{width:calc(100% - 44px);accent-color:var(--pen);vertical-align:middle}.io{color:var(--pen);font-weight:600;display:inline-block;width:36px;text-align:right}
+.fam{display:grid;grid-template-columns:1.3fr 1fr;gap:10px 40px}
+.fam label.l{display:block;font-family:"Archivo Narrow",Arial,sans-serif;margin:12px 0 2px;color:var(--mut)}
+.states{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:6px}.states label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.states input{appearance:none;width:20px;height:20px;border:2px solid var(--print);margin:0}.states input:checked{background:var(--pen);border-color:var(--pen)}
+.total{font-family:"Archivo Narrow",Arial,sans-serif;font-size:1.5rem;color:var(--pen);margin-top:10px}
+button.go{margin-top:30px;font:700 1.2rem "Archivo Narrow",Arial,sans-serif;background:var(--print);color:var(--paper);border:0;padding:12px 28px;cursor:pointer;border-radius:3px}
+.sb{display:grid;grid-template-columns:150px 1fr 56px;gap:12px;align-items:center;padding:4px 0}.sb i{display:block;height:10px;background:var(--pen)}.sb b{text-align:right;color:var(--pen)}
+details{border-bottom:1px solid var(--rule)}details.out{opacity:.8}
+summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:34px 1fr 64px 190px;gap:6px 14px;padding:12px 0;align-items:baseline}
+summary::-webkit-details-marker{display:none}
+.rk{font:700 1.5rem "Archivo Narrow",Arial,sans-serif;color:var(--print)}.nm{font-weight:600}.mt{font:700 1.5rem "Archivo Narrow",Arial,sans-serif;color:var(--pen);text-align:right}
+.fl{font-size:.88rem}.good{color:var(--good)}.bad{color:var(--bad)}
+.body{padding:2px 0 18px 48px}.body table{border-collapse:collapse;width:100%;font-size:.93rem;margin:8px 0}.body td,.body th{text-align:left;padding:5px 10px 5px 0;border-bottom:1px solid var(--rule)}
+.body th{font-family:"Archivo Narrow",Arial,sans-serif;color:var(--mut);font-weight:500}
+.mk{border-left:4px solid var(--pen);padding-left:12px;margin:10px 0 0}
+.tw{overflow-x:auto}
+.foot{margin-top:50px;color:var(--mut);font-size:.9rem;border-top:1px solid var(--rule);padding-top:12px}
+@media(max-width:700px){.srow{grid-template-columns:1fr 1fr}.srow.h{display:none}.srow>:first-child{grid-column:1/-1;font-weight:600}.fam{grid-template-columns:1fr}
+summary{grid-template-columns:30px 1fr 50px}summary .fl{grid-column:2/-1}.body{padding-left:0}.sb{grid-template-columns:110px 1fr 46px}}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style></head><body><main class="sheet">
+<h1>PRISM</h1>
+<p class="intro">Fill in the sheet the way you would an exam form. Marks, skill and interest for seven subjects, then what the family can spend and where. The ten best courses come back, checked against fees and jobs in each state.</p>
+
+<section class="part"><h2>Part A. Student</h2>
+<p class="note">Subject score = 0.4 × mark/100 + 0.3 × skill/3 + 0.3 × interest/100, read out of 100.</p>
+<div class="srow h"><span>Subject</span><span>Mark /100</span><span>Skill (fill one)</span><span>Interest</span></div><div id="st"></div></section>
+
+<section class="part"><h2>Part B. Family</h2>
+<p class="note">Tick every state the family would consider.</p>
+<div class="fam"><div><span class="hd" style="color:var(--mut)">Preferred states</span><div class="states" id="states"></div></div>
+<div><label class="l" for="bud">Approximate budget (₹ lakh)</label><input type="number" id="bud" min="0" step="0.5" value="8">
+<label class="l" for="loan">Loan the family will take (₹ lakh)</label><input type="number" id="loan" min="0" step="0.5" value="4">
+<div class="total">Total budget <span id="tot"></span></div></div></div></section>
+<button class="go" id="run">Read my sheet</button>
+<div id="out" aria-live="polite"></div>
+<p class="foot">Prototype for DataQuest 3.0 (Nano Mech Labs problem statement DQNM). Cutoffs, fees and job indices are illustrative estimates, not official figures. Fees are approximate course totals, about four years; MBBS is the full programme.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const SUB=[["M","Maths"],["P","Physics"],["C","Chemistry"],["B","Biology"],["CS","Computer Science"],["H","Humanities"],["CO","Commerce"]];
+const DEF={M:[85,2,75],P:[78,2,65],C:[72,1,50],B:[55,1,30],CS:[88,3,90],H:[60,1,40],CO:[50,1,30]};
+const ST={TN:{n:"Tamil Nadu",f:1,d:{tech:85,health:88,core:92,biz:78,arts:70,sci:75},t:"the Chennai–Coimbatore belt has strong auto, electronics, manufacturing and medical employers"},
+KA:{n:"Karnataka",f:1.1,d:{tech:98,health:80,core:80,biz:85,arts:85,sci:90},t:"Bengaluru is India's largest tech, startup and research cluster"},
+MH:{n:"Maharashtra",f:1.2,d:{tech:88,health:82,core:78,biz:98,arts:95,sci:80},t:"Mumbai and Pune lead in finance, media, design and industry"},
+DL:{n:"Delhi NCR",f:1.15,d:{tech:85,health:80,core:70,biz:90,arts:85,sci:85},t:"the NCR has consulting, policy, media and many corporate head offices"},
+TS:{n:"Telangana",f:1.05,d:{tech:94,health:90,core:78,biz:80,arts:70,sci:82},t:"Hyderabad is a major IT, pharma and life-science hub"},
+KL:{n:"Kerala",f:.9,d:{tech:70,health:85,core:60,biz:68,arts:72,sci:70},t:"healthcare, tourism and Gulf-linked services drive hiring"}};
+const C=[
+["B.Tech Computer Science & Engineering","tech",{M:60,P:50,CS:60},8,24,92],
+["B.Tech AI & Data Science","tech",{M:65,CS:60,P:45},9,22,94],
+["B.Tech Electronics & Communication","core",{M:60,P:60},6,20,78],
+["B.Tech Mechanical Engineering","core",{M:55,P:55},5,18,70],
+["B.Tech Robotics & Mechatronics","core",{M:60,P:60,CS:45},8,20,82],
+["B.Tech Civil Engineering","core",{M:50,P:50},4,15,65],
+["B.Tech Electrical & Renewable Energy","core",{M:55,P:55},6,18,84],
+["BCA / B.Sc Computer Science","tech",{CS:50,M:45},1.5,8,80],
+["MBBS (Medicine)","health",{B:70,C:65,P:55},12,80,88],
+["B.Pharm (Pharmacy)","health",{C:60,B:55},4,14,74],
+["B.Sc Biotechnology","sci",{B:55,C:55},2,10,68],
+["B.Sc Nursing / Allied Health","health",{B:50,C:45},2,10,80],
+["B.Sc Physics / Chemistry (Research track)","sci",{P:55,C:55,M:50},1.5,9,62],
+["B.Com / BBA","biz",{CO:50,M:40},1.5,10,72],
+["B.Com Finance & Analytics (CA / CFA track)","biz",{CO:60,M:55},2,12,78],
+["B.Des (UX / Product Design)","arts",{H:55,CS:40},6,20,75],
+["BA Economics / Public Policy","arts",{H:60,M:50},1.5,10,66],
+["BA Psychology / Social Sciences","arts",{H:55,B:40},1.5,8,64],
+["B.Sc Agriculture / Food Technology","sci",{B:50,C:50},3,10,70],
+["B.Arch (Architecture)","core",{M:55,P:45,H:40},8,22,68]];
+$("st").innerHTML=SUB.map(([k,n])=>`<div class="srow"><span>${n}</span><input type="number" id="m${k}" min="0" max="100" value="${DEF[k][0]}" aria-label="${n} mark">
+<div class="bubbles" role="radiogroup" aria-label="${n} skill 0 to 3">${[0,1,2,3].map(i=>`<label><input type="radio" name="s${k}" value="${i}"${i==DEF[k][1]?" checked":""} aria-label="Skill ${i}"><span>${i}</span></label>`).join("")}</div>
+<div><input type="range" id="i${k}" min="0" max="100" value="${DEF[k][2]}" aria-label="${n} interest"><output class="io" id="io${k}">${DEF[k][2]}</output></div></div>`).join("");
+SUB.forEach(([k])=>$("i"+k).addEventListener("input",()=>$("io"+k).textContent=$("i"+k).value));
+$("states").innerHTML=Object.entries(ST).map(([k,s])=>`<label><input type="checkbox" value="${k}"${k=="TN"||k=="KA"?" checked":""}>${s.n}</label>`).join("");
+const L=x=>"₹"+(Math.round(x*10)/10)+" L",cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+const tot=()=>(+$("bud").value||0)+(+$("loan").value||0);
+const upd=()=>$("tot").textContent=L(tot());["bud","loan"].forEach(i=>$(i).addEventListener("input",upd));upd();
+function run(){
+const sc={};SUB.forEach(([k])=>{const m=cl(+$("m"+k).value||0,0,100),s=+document.querySelector(`input[name=s${k}]:checked`).value,i=+$("i"+k).value;sc[k]=100*(0.4*m/100+0.3*s/3+0.3*i/100)});
+const sel=[...document.querySelectorAll("#states input:checked")].map(x=>x.value);
+if(!sel.length){$("out").innerHTML='<p class="bad" style="margin-top:20px"><b>Tick at least one state</b> in Part B so fees and jobs can be checked.</p>';return}
+const T=tot();
+let R=C.map(c=>{const ks=Object.keys(c[2]),match=ks.reduce((a,k)=>a+sc[k],0)/ks.length;
+const short=ks.filter(k=>sc[k]<c[2][k]).map(k=>SUB.find(s=>s[0]==k)[1]+" "+Math.round(sc[k])+" vs cutoff "+c[2][k]);return{c,match,short,ok:!short.length}}).sort((a,b)=>(b.ok-a.ok)||(b.match-a.match)).slice(0,10);
+R.forEach(r=>{const c=r.c;r.rows=sel.map(k=>{const s=ST[k],mn=c[3]*s.f,mx=c[4]*s.f;return{s,mn,mx,job:Math.round(c[5]*s.d[c[1]]/100),aff:T>=mn}});
+const ok=r.rows.filter(x=>x.aff);r.aff=ok.length>0;r.fin=r.aff?Math.max(...ok.map(x=>x.mx<=T?1:.9+.1*(T-x.mn)/(x.mx-x.mn))):0;r.adj=r.match*(r.aff?r.fin:1)});
+R.sort((a,b)=>(b.aff-a.aff)||(b.adj-a.adj));
+let h=`<section class="part"><h2>Part C. Subject scores</h2><div style="margin-top:8px">${SUB.map(([k,n])=>`<div class="sb"><span>${n}</span><span><i style="width:${sc[k]}%"></i></span><b>${Math.round(sc[k])}</b></div>`).join("")}</div></section>
+<section class="part"><h2>Part D. Ten best courses</h2><p class="note">Total budget ${L(T)}. Open any row for state fees and jobs.</p>`;
+R.forEach((r,i)=>{const c=r.c,ok=r.rows.filter(x=>x.aff),best=(ok.length?ok:r.rows).slice().sort((a,b)=>b.job-a.job)[0];
+const better=r.rows.filter(x=>!x.aff&&x.job>best.job).sort((a,b)=>b.job-a.job)[0];
+let mk=r.aff?`Most jobs for ${c[0]} among the states you can afford: <b>${best.s.n}</b>, job index ${best.job}/100, because ${best.s.t}.`:`Demand is strongest in ${best.s.n} (index ${best.job}/100), but the budget does not reach any chosen state.`;
+if(r.aff&&better)mk+=` ${better.s.n} scores higher (${better.job}) but fees start at ${L(better.mn)}, above your budget.`;
+const fl=!r.aff?`<span class="bad">Financial instability: budget is below the minimum fee in every chosen state</span>`:r.fin<1?`<span>Tight budget</span>`:`<span class="good">Within budget</span>`;
+h+=`<details${r.aff?"":' class="out"'}><summary><span class="rk">${i+1}</span><span class="nm">${c[0]}</span><span class="mt">${Math.round(r.adj)}</span><span class="fl">${fl}${r.aff?" · best state "+best.s.n:""}</span></summary>
+<div class="body">${r.ok?`<span class="good">Meets every cutoff.</span> Match ${Math.round(r.match)}.`:`<span class="bad">Below cutoff:</span> ${r.short.join("; ")}. Raise these subjects to qualify.`}
+<div class="tw"><table><tr><th>State</th><th>Fees</th><th>Funding</th><th>Job index</th></tr>${r.rows.map(x=>`<tr><td>${x.s.n}</td><td>${L(x.mn)} to ${L(x.mx)}</td><td class="${x.aff?"good":"bad"}">${x.aff?"Affordable":"Dropped: below minimum fee"}</td><td>${x.job}</td></tr>`).join("")}</table></div>
+<p class="mk">${mk}</p></div></details>`});
+$("out").innerHTML=h+"</section>";$("out").scrollIntoView()}
+$("run").addEventListener("click",run);
+</script></body></html>
