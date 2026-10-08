@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>PRISM · Course and career matching</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 40'%3E%3Cpath d='M4 34L20 6l16 28z' fill='none' stroke='%23111' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M28.6 20L43 10' stroke='%23e5484d' stroke-width='3'/%3E%3Cpath d='M28.6 20L43 20' stroke='%2330a46c' stroke-width='3'/%3E%3Cpath d='M28.6 20L43 30' stroke='%233355d1' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #ffffff; --card: #ffffff; --ink: #111111; --mute: #777777; --rule: #e5e5e5; --field: #d4d4d4;
+    --accent: #3355d1; --accent-dark: #2742a8;
+    --good: #1f7a4d; --warn: #b7791f; --bad: #c0392b; --info: #3355d1;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 var(--sans); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 90px; }
+  .hidden { display: none !important; }
+
+  /* header */
+  .top { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;
+         border-bottom: 1px solid var(--ink); padding-bottom: 14px; margin-bottom: 30px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand svg { display: block; flex: none; }
+  .top h1 { font: 600 34px/1 var(--serif); letter-spacing: .04em; margin: 0; }
+  .top p { margin: 6px 0 0; color: var(--mute); font-size: 14px; }
+  .tabs { display: flex; gap: 22px; }
+  .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 4px 0; margin-bottom: -15px;
+                 font: 500 14px var(--sans); color: var(--mute); cursor: pointer; }
+  .tabs button:hover { color: var(--ink); }
+  .tabs button.on { color: var(--ink); border-bottom-color: var(--accent); }
+
+  /* form sheets */
+  .cols { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: start; }
+  .sheet h2 { font: 600 24px/1.2 var(--serif); margin: 0 0 14px; display: flex; align-items: baseline; gap: 10px; }
+  .sheet h2 .n { font: 400 12px var(--mono); color: var(--accent); }
+  .help { color: var(--mute); font-size: 13px; margin: 0 0 12px; }
+  .block { margin-top: 24px; }
+  .block > .cap { font-weight: 600; font-size: 13px; margin: 0 0 8px; }
+  .block > .cap span { font-weight: 400; color: var(--mute); }
+  .note { color: var(--warn); font-size: 12px; margin: 6px 0 0; }
+
+  .field label { display: block; font-size: 12px; color: var(--mute); margin-bottom: 4px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fields .full { grid-column: 1 / -1; }
+  input[type=number], select, input[type=text] {
+    width: 100%; background: #fff; border: 1px solid var(--field); border-radius: 3px;
+    padding: 8px 10px; font: inherit; color: var(--ink); }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+  /* subject table */
+  .subj-head, .subj { display: grid; grid-template-columns: 128px 74px 1fr 1fr; gap: 12px; align-items: center; }
+  .subj-head { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--mute);
+               padding-bottom: 6px; border-bottom: 1px solid var(--ink); }
+  .subj { padding: 7px 0; border-bottom: 1px solid var(--rule); }
+  .subj .name { font-size: 14px; }
+  .subj .lbl { display: none; font-size: 11px; color: var(--mute); margin-bottom: 3px; }
+  .subj input[type=number] { padding: 6px 8px; font-family: var(--mono); font-size: 13px; }
+
+  /* 0-3 / 1-5 button groups */
+  .seg { display: inline-flex; }
+  .seg label { position: relative; margin: 0; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg span { display: block; min-width: 34px; text-align: center; padding: 6px 0; margin-left: -1px;
+              border: 1px solid var(--field); background: #fff; cursor: pointer;
+              font: 400 13px var(--mono); color: var(--ink); }
+  .seg label:first-child span { margin-left: 0; border-radius: 3px 0 0 3px; }
+  .seg label:last-child span { border-radius: 0 3px 3px 0; }
+  .seg span:hover { border-color: var(--mute); }
+  .seg input:checked + span { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .seg.wide span { min-width: 44px; }
+
+  /* course chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font: 400 13px var(--sans); padding: 5px 10px; background: #fff; color: var(--ink);
+          border: 1px solid var(--field); border-radius: 3px; cursor: pointer; }
+  .chip:hover { border-color: var(--ink); }
+  .chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  .go { margin-top: 28px; background: var(--accent); color: #fff; border: 0; border-radius: 3px;
+        padding: 12px 24px; font: 600 14px var(--sans); cursor: pointer; }
+  .go:hover { background: var(--accent-dark); }
+  .risk-text { font-size: 12px; color: var(--mute); margin: 6px 0 0; }
+
+  /* db lookup */
+  .lookup { display: flex; gap: 10px; max-width: 460px; }
+  .lookup .go { margin-top: 0; white-space: nowrap; }
+
+  /* profile panel */
+  .panel { display: grid; grid-template-columns: 300px 1fr; gap: 40px; margin: 34px 0 10px;
+           border-top: 1px solid var(--ink); padding-top: 22px; }
+  .panel h3 { font: 600 19px var(--serif); margin: 0 0 10px; }
+  .ci-num { font: 500 54px/1 var(--serif); }
+  .ci-lbl { font-size: 14px; margin-left: 8px; }
+  .meter { height: 3px; background: var(--rule); margin: 10px 0 14px; }
+  .meter i { display: block; height: 100%; }
+  .brk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+  .brk div { font-size: 11px; color: var(--mute); }
+  .brk b { display: block; font: 500 15px var(--mono); color: var(--ink); }
+  .kv { font-size: 13px; color: var(--mute); margin: 3px 0; }
+  .kv b { color: var(--ink); font-weight: 500; }
+  .advice { font-size: 13px; margin-top: 10px; padding-left: 10px; border-left: 2px solid var(--accent); }
+
+  .swot { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .swot > div { background: var(--card); padding: 12px 14px; }
+  .swot h4 { margin: 0 0 6px; font: 600 11px var(--sans); text-transform: uppercase; letter-spacing: .08em; }
+  .swot ul { margin: 0; padding-left: 16px; font-size: 13px; }
+  .swot li { margin: 3px 0; }
+  .swot .none { color: var(--mute); list-style: none; margin-left: -16px; }
+  .c-good { color: var(--good); } .c-warn { color: var(--warn); } .c-bad { color: var(--bad); } .c-info { color: var(--info); }
+
+  .subjscores { grid-column: 1 / -1; margin-top: 6px; }
+  .subjscores .cap { font-size: 12px; color: var(--mute); margin: 0 0 8px; }
+  .ss { display: grid; grid-template-columns: 140px 1fr 36px; gap: 12px; align-items: center; font-size: 13px; padding: 3px 0; }
+  .ss .bar { height: 3px; background: var(--rule); }
+  .ss .bar i { display: block; height: 100%; background: var(--ink); }
+  .ss b { font: 500 13px var(--mono); text-align: right; }
+
+  /* results */
+  .res-head { display: flex; justify-content: space-between; align-items: baseline;
+              border-bottom: 1px solid var(--ink); padding: 26px 0 8px; margin-top: 20px; }
+  .res-head h2 { font: 600 24px var(--serif); margin: 0; }
+  .res-head span { font-size: 12px; color: var(--mute); }
+  .empty { padding: 44px 0; color: var(--mute); text-align: center; }
+  .empty.err { color: var(--bad); }
+
+  .row { display: grid; grid-template-columns: 34px 1fr 200px 250px 78px; gap: 22px; align-items: start;
+         padding: 18px 0 18px 12px; border-bottom: 1px solid var(--rule); border-left: 2px solid transparent; }
+  .row.pick { border-left-color: var(--accent); }
+  .rank { font: 400 14px var(--mono); color: var(--mute); padding-top: 3px; }
+  .row h3 { font: 600 20px/1.2 var(--serif); margin: 0; }
+  .meta { font-size: 13px; color: var(--mute); margin: 3px 0 0; }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 7px; margin: 6px 6px 0 0; border: 1px solid var(--rule); border-radius: 2px; color: var(--mute); }
+  .tag.t-pick { border-color: var(--accent); color: var(--accent); }
+  .tag.t-parent { border-color: var(--good); color: var(--good); }
+  .money { font-size: 13px; margin: 0; }
+  .money dt { font-size: 11px; color: var(--mute); margin-top: 8px; }
+  .money dt:first-child { margin-top: 0; }
+  .money dd { margin: 0; font: 500 14px var(--mono); }
+  .fits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 14px; }
+  .fit { font-size: 11px; color: var(--mute); }
+  .fit b { display: block; font: 500 13px var(--mono); color: var(--ink); }
+  .fit .bar { height: 3px; background: var(--rule); margin-top: 3px; }
+  .fit .bar i { display: block; height: 100%; background: var(--ink); }
+  .score { text-align: right; font: 500 30px/1 var(--serif); }
+  .score small { display: block; font: 400 10px var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--mute); margin-top: 4px; }
+
+  @media (max-width: 920px) {
+    .cols, .panel { grid-template-columns: 1fr; gap: 28px; }
+    .row { grid-template-columns: 30px 1fr 70px; row-gap: 14px; }
+    .row .money, .row .fits { grid-column: 2 / -1; }
+    .row .score { grid-column: 3; grid-row: 1; }
+  }
+  @media (max-width: 560px) {
+    .subj-head { display: none; }
+    .subj { grid-template-columns: 1fr 1fr; }
+    .subj .name { grid-column: 1 / -1; font-weight: 500; }
+    .subj .lbl { display: block; }
+    .fields { grid-template-columns: 1fr; }
+    .swot { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <svg width="46" height="42" viewBox="0 0 44 40" role="img" aria-label="PRISM logo">
+        <path d="M4 34 L20 6 L36 34 Z" fill="none" stroke="#111" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M0 26 L11.4 20" stroke="#111" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M11.4 20 L28.6 20" stroke="#111" stroke-width="1.2" opacity=".35"/>
+        <path d="M28.6 20 L43 8"  stroke="#e5484d" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M28.6 20 L43 14" stroke="#f5a524" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M28.6 20 L43 20" stroke="#30a46c" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M28.6 20 L43 26" stroke="#3355d1" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>PRISM</h1>
+        <p>Course and career matching for students and their families</p>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button id="tabCustom" class="on" onclick="switchTab('custom')">Simulator</button>
+      <button id="tabDb" onclick="switchTab('db')">Student ID lookup</button>
+    </nav>
+  </header>
+
+  <!-- SIMULATOR -->
+  <section id="customFormSection">
+    <div class="cols">
+
+      <div class="sheet">
+        <h2><span class="n">01</span>Student</h2>
+        <p class="help">Enter your mark in each subject, then rate your interest and skill from 0 (none) to 3 (very high). Use 0 for a subject you don't study.</p>
+
+        <div class="subj-head"><span>Subject</span><span>Mark /100</span><span>Interest</span><span>Skill</span></div>
+        <div id="subjectRows"></div>
+
+        <div class="block">
+          <p class="cap">Courses you like <span>(optional, up to 3)</span></p>
+          <div id="courseChipsS" class="chips"><span class="help">Loading courses...</span></div>
+          <p id="courseNoteS" class="note"></p>
+        </div>
+
+        <div class="block field">
+          <label for="priority">What matters most to you</label>
+          <select id="priority">
+            <option value="balanced" selected>A balance of everything</option>
+            <option value="salary">High salary</option>
+            <option value="passion">Following my passion</option>
+            <option value="stability">Job stability and low risk</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <h2><span class="n">02</span>Family</h2>
+        <div class="fields">
+          <div class="field">
+            <label for="customBudget">Annual budget (₹)</label>
+            <input id="customBudget" type="number" min="0" step="10000" value="250000">
+          </div>
+          <div class="field">
+            <label for="customLoan">Loan capacity (₹)</label>
+            <input id="customLoan" type="number" min="0" step="10000" value="100000">
+          </div>
+          <div class="field full">
+            <label for="customState">Preferred state</label>
+            <select id="customState">
+              <option value="Karnataka">Karnataka</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Tamil Nadu" selected>Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="block">
+          <p class="cap">Courses the parents prefer <span>(optional, up to 3)</span></p>
+          <div id="courseChipsP" class="chips"><span class="help">Loading courses...</span></div>
+          <p id="courseNoteP" class="note"></p>
+        </div>
+
+        <div class="block">
+          <p class="cap">Parents' appetite for risk</p>
+          <div class="seg wide" id="riskSeg"></div>
+          <p class="risk-text" id="riskText"></p>
+        </div>
+
+        <button class="go" onclick="calculateCustomPath()">Calculate matches</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DB LOOKUP -->
+  <section id="dbSearchSection" class="hidden">
+    <div class="sheet">
+      <h2><span class="n">01</span>Student record</h2>
+      <p class="help">Looks up a student already stored in the database.</p>
+      <div class="lookup">
+        <input id="studentIdInput" type="text" value="STU10001" placeholder="Student ID">
+        <button class="go" onclick="fetchDbRecommendations()">Look up</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="profilePanel" class="hidden"></div>
+
+  <div class="res-head">
+    <h2>Ranked matches</h2>
+    <span id="matchCount">Nothing calculated yet</span>
+  </div>
+  <div id="resultsGrid">
+    <div class="empty">Fill in both parts and press <b>Calculate matches</b>.</div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = "";
+  const SUBJECTS = [   // key, label, default mark
+    ["maths", "Maths", 75],
+    ["physics", "Physics", 70],
+    ["chemistry", "Chemistry", 65],
+    ["economics", "Economics", 60],
+    ["cs", "Computer Science", 80],
+    ["biology", "Biology", 55],
+    ["humanities", "Humanities", 60],
+  ];
+  const RISK_TEXT = {
+    1: "Wants guaranteed stability",
+    2: "Cautious",
+    3: "Balanced",
+    4: "Open to risk",
+    5: "Comfortable with high risk",
+  };
+  let COURSES = [];
+  const sel = { S: new Set(), P: new Set() };   // S = student picks, P = parent picks
+
+  const $ = id => document.getElementById(id);
+  const grid = () => $("resultsGrid");
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  // ----- 0-3 buttons -----
+  function seg(name, from, to, checked) {
+    let out = "";
+    for (let v = from; v <= to; v++) {
+      out += `<label><input type="radio" name="${name}" value="${v}" ${v === checked ? "checked" : ""}><span>${v}</span></label>`;
+    }
+    return out;
+  }
+  const radioVal = name => parseInt(document.querySelector(`input[name="${name}"]:checked`).value);
+
+  $("subjectRows").innerHTML = SUBJECTS.map(([k, label, def]) => `
+    <div class="subj">
+      <div class="name">${label}</div>
+      <div><span class="lbl">Mark</span>
+        <input type="number" min="0" max="100" value="${def}" id="mk_${k}" aria-label="${label} mark"></div>
+      <div><span class="lbl">Interest</span><div class="seg" role="radiogroup" aria-label="${label} interest">${seg("si_" + k, 0, 3, 1)}</div></div>
+      <div><span class="lbl">Skill</span><div class="seg" role="radiogroup" aria-label="${label} skill">${seg("sk_" + k, 0, 3, 1)}</div></div>
+    </div>`).join("");
+
+  $("riskSeg").innerHTML = seg("parentRisk", 1, 5, 3);
+  $("riskText").textContent = RISK_TEXT[3];
+  document.querySelectorAll('input[name="parentRisk"]').forEach(r =>
+    r.addEventListener("change", () => { $("riskText").textContent = RISK_TEXT[radioVal("parentRisk")]; }));
+
+  // ----- Course chips (student + parents share one list) -----
+  function refreshChips(which) {
+    document.querySelectorAll(`#courseChips${which} button`).forEach(b => {
+      b.className = "chip" + (sel[which].has(COURSES[+b.dataset.i].name) ? " on" : "");
+    });
+  }
+  function toggleCourse(which, i) {
+    const name = COURSES[i].name, note = $("courseNote" + which);
+    note.textContent = "";
+    if (sel[which].has(name)) sel[which].delete(name);
+    else if (sel[which].size >= 3) { note.textContent = "Pick at most 3 courses."; return; }
+    else sel[which].add(name);
+    refreshChips(which);
+  }
+  async function initCourses() {
+    try {
+      const res = await fetch(`${API_BASE}/api/courses`, { cache: "no-store" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "HTTP " + res.status);
+      COURSES = data.courses || [];
+      ["S", "P"].forEach(which => {
+        $("courseChips" + which).innerHTML = COURSES.map((c, i) =>
+          `<button type="button" class="chip" data-i="${i}" onclick="toggleCourse('${which}', ${i})" title="${esc(c.domain)} · ${esc(c.key_subjects)}">${esc(c.name)}</button>`).join("");
+        refreshChips(which);
+      });
+    } catch (err) {
+      console.error(err);
+      ["S", "P"].forEach(which => {
+        $("courseChips" + which).innerHTML = "";
+        $("courseNote" + which).textContent = "Could not load the course list (" + err.message + "). You can still calculate without it.";
+      });
+    }
+  }
+
+  function switchTab(mode) {
+    const custom = mode === "custom";
+    $("customFormSection").classList.toggle("hidden", !custom);
+    $("dbSearchSection").classList.toggle("hidden", custom);
+    $("tabCustom").className = custom ? "on" : "";
+    $("tabDb").className = custom ? "" : "on";
+  }
+
+  function showMsg(html, err) {
+    $("profilePanel").classList.add("hidden");
+    grid().innerHTML = `<div class="empty ${err ? "err" : ""}">${html}</div>`;
+  }
+
+  async function calculateCustomPath() {
+    const marks = {}, subject_interest = {}, subject_skill = {};
+    SUBJECTS.forEach(([k]) => {
+      const m = parseFloat($("mk_" + k).value);
+      marks[k] = isNaN(m) ? 0 : Math.min(100, Math.max(0, m));
+      subject_interest[k] = radioVal("si_" + k);
+      subject_skill[k] = radioVal("sk_" + k);
+    });
+    const payload = {
+      marks, subject_interest, subject_skill,
+      preferred_courses: [...sel.S],
+      priority: $("priority").value,
+      annual_budget_inr: parseFloat($("customBudget").value) || 0,
+      loan_capacity_inr: parseFloat($("customLoan").value) || 0,
+      relocation_state_preference: $("customState").value,
+      parent_courses: [...sel.P],
+      parent_risk: radioVal("parentRisk"),
+    };
+    showMsg("Working it out...");
+    try {
+      const res = await fetch(`${API_BASE}/api/recommend/custom`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail));
+      renderProfile(data.profile);
+      renderRecommendations(data.recommendations || []);
+    } catch (err) {
+      console.error(err);
+      showMsg("Error: " + esc(err.message), true);
+    }
+  }
+
+  async function fetchDbRecommendations() {
+    const id = $("studentIdInput").value.trim();
+    if (!id) return showMsg("Enter a student ID.", true);
+    showMsg("Fetching record...");
+    try {
+      const res = await fetch(`${API_BASE}/api/recommend/${encodeURIComponent(id)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Request failed");
+      renderProfile(data.profile);
+      renderRecommendations(data.recommendations || []);
+    } catch (err) {
+      console.error(err);
+      showMsg("Error: " + esc(err.message), true);
+    }
+  }
+
+  function swotBox(title, items, cls) {
+    const list = items.length ? items.map(i => `<li>${esc(i)}</li>`).join("") : `<li class="none">None flagged</li>`;
+    return `<div><h4 class="${cls}">${title}</h4><ul>${list}</ul></div>`;
+  }
+
+  function renderProfile(p) {
+    if (!p) return $("profilePanel").classList.add("hidden");
+    const ci = p.conflict_index, b = p.conflict_breakdown;
+    const tone = ci < 30 ? "good" : ci < 60 ? "warn" : "bad";
+    const subj = Object.entries(p.subject_scores || {}).map(([name, v]) =>
+      `<div class="ss"><span>${esc(name)}</span><div class="bar"><i style="width:${v}%"></i></div><b>${v}</b></div>`).join("");
+
+    $("profilePanel").innerHTML = `
+      <div class="panel">
+        <div>
+          <h3>Parent-student conflict</h3>
+          <div><span class="ci-num c-${tone}">${ci}</span><span class="ci-lbl c-${tone}">${esc(p.conflict_label)}</span></div>
+          <div class="meter"><i style="width:${ci}%;background:var(--${tone})"></i></div>
+          <div class="brk">
+            <div>Field<b>${b.domain}</b></div><div>Risk<b>${b.risk}</b></div><div>Money<b>${b.money}</b></div>
+          </div>
+          <p class="kv">Student leans towards <b>${esc(p.top_domain)}</b></p>
+          <p class="kv">Parents prefer <b>${esc(p.parent_domain)}</b></p>
+          <p class="advice">${esc(p.advice)}</p>
+        </div>
+        <div>
+          <h3>Student SWOT</h3>
+          <div class="swot">
+            ${swotBox("Strengths", p.swot.strengths, "c-good")}
+            ${swotBox("Weaknesses", p.swot.weaknesses, "c-warn")}
+            ${swotBox("Opportunities", p.swot.opportunities, "c-info")}
+            ${swotBox("Threats", p.swot.threats, "c-bad")}
+          </div>
+        </div>
+        <div class="subjscores">
+          <h3>Subject scores</h3>
+          <p class="cap">40% mark, 30% skill, 30% interest</p>
+          ${subj}
+        </div>
+      </div>`;
+    $("profilePanel").classList.remove("hidden");
+  }
+
+  const lakh = v => (v == null ? "–" : (v / 100000).toFixed(2));
+  const fit = (label, v) => {
+    const n = v == null ? 0 : v;
+    return `<div class="fit">${label}<b>${v ?? "–"}</b><div class="bar"><i style="width:${n}%"></i></div></div>`;
+  };
+
+  function renderRecommendations(items) {
+    $("matchCount").textContent = `${items.length} options`;
+    if (!items.length) return showMsg("No matches found.");
+
+    grid().innerHTML = items.map((r, idx) => `
+      <article class="row ${r.preferred ? "pick" : ""}">
+        <div class="rank">${String(idx + 1).padStart(2, "0")}</div>
+        <div>
+          <h3>${esc(r.course_name)}</h3>
+          <p class="meta">${esc(r.state_name)}${r.state_match ? " (your state)" : ""} · ${esc(r.domain)}</p>
+          <p class="meta">Key subjects: ${esc(r.key_subjects)}</p>
+          <div>
+            ${r.preferred ? '<span class="tag t-pick">Student pick</span>' : ""}
+            ${r.parent_pick ? '<span class="tag t-parent">Parents\' pick</span>' : ""}
+            <span class="tag">Scope: ${esc(r.future_scope)}</span>
+          </div>
+        </div>
+        <dl class="money">
+          <dt>Annual fee</dt><dd>₹${lakh(r.min_fee)}L to ₹${lakh(r.max_fee)}L</dd>
+          <dt>Median salary</dt><dd>₹${lakh(r.median_salary)} LPA</dd>
+        </dl>
+        <div class="fits">
+          ${fit("Marks", r.academic_fit)}${fit("Interest", r.interest_fit)}${fit("Skill", r.skill_fit)}
+          ${fit("Money", r.financial_affordability)}${fit("Risk", r.risk_fit)}${fit("Parents", r.parent_alignment)}
+        </div>
+        <div class="score">${r.prism_match_score ?? "–"}<small>out of 100</small></div>
+      </article>`).join("");
+  }
+
+  initCourses();
+</script>
+</body>
+</html>
